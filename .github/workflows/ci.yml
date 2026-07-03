@@ -1,0 +1,32 @@
+name: CI
+
+# Validation on every PR (and on non-main branch pushes) — catches regressions before merge.
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches-ignore: [main]
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build (static export + relativize guard)
+        run: npm run build # next build (incl. TypeScript) + scripts/relativize-export.mjs
+
+      - name: Verify export is self-contained & relative (risk #1 guard)
+        run: npm run verify:export

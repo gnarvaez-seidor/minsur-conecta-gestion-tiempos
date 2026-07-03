@@ -1,0 +1,10 @@
+_schema-version: "3.2"
+ID: minsur-conecta-gestion-tiempos-dev
+extends: minsur-conecta-gestion-tiempos
+
+# DEV es el default del mta.yaml; este extension existe por simetría.
+#   cf deploy mta_archives/*.mtar -e mtaext/dev.mtaext
+modules:
+  - name: minsur-conecta-gestion-tiempos-destination-content
+    parameters:
+      gateway-url: https://minsur-apigateway-backend-dev.cfapps.us10-001.hana.ondemand.com

@@ -1,0 +1,98 @@
+_schema-version: "3.2"
+ID: minsur-conecta-gestion-tiempos
+version: 0.0.3
+
+modules:
+  # 1. Registers destinations in the subaccount (HTML5 Repo + XSUAA)
+  - name: minsur-conecta-gestion-tiempos-destination-content
+    type: com.sap.application.content
+    requires:
+      - name: uaa_minsur-conecta-gestion-tiempos
+        parameters:
+          service-key:
+            name: uaa_minsur-conecta-gestion-tiempos-key
+      - name: minsur-conecta-gestion-tiempos_html_repo_host
+        parameters:
+          service-key:
+            name: minsur-conecta-gestion-tiempos_html_repo_host-key
+      - name: minsur-conecta-gestion-tiempos-destination-service
+        parameters:
+          content-target: true
+    parameters:
+      # URL del API Gateway por ambiente (default dev; override con mtaext/{qas,prd}.mtaext).
+      gateway-url: https://minsur-apigateway-backend-dev.cfapps.us10-001.hana.ondemand.com
+      content:
+        subaccount:
+          destinations:
+            - Name: repo_app_minsur-conecta-gestion-tiempos_html_repo_host
+              ServiceInstanceName: minsur-conecta-gestion-tiempos-html5-host
+              ServiceKeyName: minsur-conecta-gestion-tiempos_html_repo_host-key
+              sap.cloud.service: minsur-conecta-gestion-bs
+            - Authentication: OAuth2UserTokenExchange
+              Name: repo_app_minsur-conecta-gestion-tiempos_uaa
+              ServiceInstanceName: xsuaa-central
+              ServiceKeyName: uaa_minsur-conecta-gestion-tiempos-key
+              sap.cloud.service: minsur-conecta-gestion-bs
+            # Nota: dest-apigateway / dest-apiseguridad (destinos planos hacia el gateway)
+            # se crean a nivel subaccount vía la API del destination service
+            # (scripts/create-destinations.sh), no por este content-deployer, que exige
+            # ServiceInstanceName por destino.
+          existing_destinations_policy: update
+    build-parameters:
+      no-source: true
+
+  # 2. Uploads the Next.js static bundle to the HTML5 App Repository
+  - name: minsur-conecta-gestion-tiempos_ui_deployer
+    type: com.sap.application.content
+    path: .
+    requires:
+      - name: minsur-conecta-gestion-tiempos_html_repo_host
+        parameters:
+          content-target: true
+    build-parameters:
+      build-result: resources
+      requires:
+        - artifacts:
+            - minsur-conecta-gestion-tiempos-app-content.zip
+          name: minsur-conecta-gestion-tiempos-app
+          target-path: resources/
+
+  # 3. Next.js app. mbt builds modules in a temp dir and does NOT auto-zip html5 output, so the
+  #    content zip must be PRE-BUILT at the project root before `mbt build` (the deployer below
+  #    has no build-result, so it copies the artifact from this module's path = project root).
+  #    Pre-build with:  npm ci && npm run build && npm run package:content
+  #    (proven medifarma mechanism; CI does this in .github/workflows/deploy.yml).
+  - name: minsur-conecta-gestion-tiempos-app
+    type: html5
+    path: .
+    build-parameters:
+      builder: custom
+      commands:
+        - echo "Using prebuilt minsur-conecta-gestion-tiempos-app-content.zip (npm run build && npm run package:content)"
+      supported-platforms: []
+
+resources:
+  - name: minsur-conecta-gestion-tiempos-destination-service
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: destination
+      service-name: minsur-conecta-gestion-tiempos-dest
+      service-plan: lite
+
+  - name: minsur-conecta-gestion-tiempos_html_repo_host
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: html5-apps-repo
+      service-name: minsur-conecta-gestion-tiempos-html5-host
+      service-plan: app-host
+
+  # Reusa la instancia XSUAA compartida `xsuaa-central` (misma que valida el gateway),
+  # en vez de crear una propia. Debe existir en el subaccount/space destino.
+  # xs-security.json queda sin usar (se conserva sólo como referencia).
+  - name: uaa_minsur-conecta-gestion-tiempos
+    type: org.cloudfoundry.existing-service
+    parameters:
+      service-name: xsuaa-central
+
+# No before-all: the app is pre-built (npm run build && npm run package:content) before
+# `mbt build`, which then just packages the content zip. See .github/workflows/deploy.yml.

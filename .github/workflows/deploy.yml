@@ -1,0 +1,76 @@
+name: Deploy to SAP Build Work Zone
+
+# Deploys the HTML5 module (MTA) to the HTML5 Application Repository,
+# which SAP Build Work Zone consumes as a content provider.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Never cancel an in-progress deploy; serialize deploys per ref.
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  # --- Non-sensitive: Settings > Secrets and variables > Actions > Variables ---
+  CF_API: ${{ vars.CF_API }} # e.g. https://api.cf.eu10-004.hana.ondemand.com
+  CF_ORG: ${{ vars.CF_ORG }}
+  CF_SPACE: ${{ vars.CF_SPACE }}
+  CF_ORIGIN: ${{ vars.CF_ORIGIN }} # optional: set ONLY if you use a corporate IdP (IAS / SSO)
+  # --- Sensitive: Settings > Secrets and variables > Actions > Secrets ---
+  CF_USERNAME: ${{ secrets.CF_USERNAME }} # cf auth reads these from the environment automatically
+  CF_PASSWORD: ${{ secrets.CF_PASSWORD }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install CF CLI v8 + MTA Build Tool
+        run: |
+          wget -q -O - https://packages.cloudfoundry.org/debian/cli.cloudfoundry.org.key \
+            | sudo gpg --dearmor -o /usr/share/keyrings/cf-cli-archive-keyring.gpg
+          echo "deb [signed-by=/usr/share/keyrings/cf-cli-archive-keyring.gpg] https://packages.cloudfoundry.org/debian stable main" \
+            | sudo tee /etc/apt/sources.list.d/cloudfoundry-cli.list
+          sudo apt-get update && sudo apt-get install -y cf8-cli
+          npm install -g mbt
+          cf version
+
+      - name: Install MultiApps plugin
+        run: cf install-plugin multiapps -f
+
+      - name: Build app + content zip
+        # mbt does NOT build/zip the html5 output; pre-build the static export and package it
+        # into the content zip the MTA deployer copies (see mta.yaml module #3).
+        run: |
+          npm ci
+          npm run build           # next build (static export) + relativize-export
+          npm run verify:export   # guard: relative + self-contained (risk #1)
+          npm run package:content # zip out/ -> btp-workzone-nextjs-template-app-content.zip
+
+      - name: Build MTA
+        run: mbt build -p=cf -t=mta_archives
+
+      - name: Authenticate to Cloud Foundry
+        run: |
+          cf api "$CF_API"
+          if [ -n "$CF_ORIGIN" ]; then
+            # Corporate IdP (SAP Identity Authentication / SSO)
+            cf auth "$CF_USERNAME" "$CF_PASSWORD" --origin "$CF_ORIGIN"
+          else
+            # Default UAA origin — cf auth reads CF_USERNAME / CF_PASSWORD from the environment
+            cf auth
+          fi
+          cf target -o "$CF_ORG" -s "$CF_SPACE"
+
+      - name: Deploy MTA
+        run: cf deploy "$(ls mta_archives/*.mtar | head -n 1)" -f

@@ -1,0 +1,17 @@
+# Evita que `COPY . .` del Dockerfile arrastre artefactos del host a la imagen.
+# Crítico: sin esto, node_modules del host (darwin) pisa /app/node_modules (linux)
+# y rompe binarios nativos (swc / lightningcss) dentro del container.
+node_modules
+.next
+out
+dist
+.git
+.env
+.env.*
+!.env.example
+mta_archives
+*.zip
+Dockerfile
+.dockerignore
+npm-debug.log
+.DS_Store

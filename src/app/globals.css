@@ -1,0 +1,306 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* MINSUR Conecta — teal identity (from Simulador Roster source of truth) */
+:root {
+  --background: #eef4f5;
+  --foreground: #0f3940;
+  --card: #ffffff;
+  --card-border: #d8e6e7;
+  --muted: #6a838a;
+  --accent: #028090;
+  --accent-hover: #14b8a6;
+  --accent-light: #e2f1f1;
+  /* teal identity tokens */
+  --teal-deep: #0f3940;
+  --teal-primary: #028090;
+  --teal-mid: #14b8a6;
+  --mint: #02c39a;
+  --mint-soft: #b6e3d4;
+  /* elevation + gradients (teal-tinted) */
+  --grad-header: linear-gradient(120deg, #028090 0%, #0f3940 100%);
+  --grad-accent: linear-gradient(135deg, #028090 0%, #14b8a6 100%);
+  --grad-mint: linear-gradient(135deg, #02c39a 0%, #14b8a6 100%);
+  --sh-md: 0 4px 12px rgba(15, 57, 64, 0.09), 0 2px 4px rgba(15, 57, 64, 0.05);
+  --sh-lg: 0 12px 30px rgba(15, 57, 64, 0.14), 0 4px 10px rgba(15, 57, 64, 0.07);
+  /* legacy aliases kept so template components don't break (retinted to teal) */
+  --seidor-navy: #0f3940;
+  --seidor-blue: #028090;
+  --seidor-cyan: #14b8a6;
+  --seidor-violet: #02c39a;
+}
+
+.dark {
+  --background: #081215;
+  --foreground: #e7f4f4;
+  --card: #10242a;
+  --card-border: #1c353c;
+  --muted: #7f9ea3;
+  --accent: #2dd4bf;
+  --accent-hover: #5eead4;
+  --accent-light: #123531;
+  --teal-deep: #0b3b40;
+  --teal-primary: #14b8a6;
+  --teal-mid: #2dd4bf;
+  --mint: #2dd4bf;
+  --mint-soft: #134b43;
+  --grad-header: linear-gradient(120deg, #0b3b40 0%, #06181c 100%);
+  --sh-md: 0 6px 16px rgba(0, 0, 0, 0.45);
+  --sh-lg: 0 16px 40px rgba(0, 0, 0, 0.55);
+  --seidor-navy: #7fe0d4;
+  --seidor-blue: #2dd4bf;
+  --seidor-cyan: #5eead4;
+  --seidor-violet: #6ee7b7;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  /* Fonts come from next/font/local|google (see app/layout.tsx) — NOT a Google Fonts @import (CSP/offline). */
+  --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
+  --font-display: var(--font-jakarta), system-ui, sans-serif;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Smooth light/dark swap driven by WorkzoneThemeContext (postMessage / manual toggle). */
+.theme-transitioning,
+.theme-transitioning * {
+  transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease,
+    fill 0.4s ease, stroke 0.4s ease !important;
+}
+
+/* ═══════════════════════════════════════════
+   TRANSITIONS & ANIMATIONS
+   ═══════════════════════════════════════════ */
+
+/* Global smooth transitions */
+button, a, input, select, textarea {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Card hover — lift + shadow + glow */
+.card-hover {
+  transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.3s ease;
+}
+.card-hover:hover {
+  box-shadow: 0 8px 30px rgba(15, 57, 64, 0.1), 0 2px 8px rgba(2, 128, 144, 0.06);
+  transform: translateY(-2px);
+  border-color: rgba(2, 128, 144, 0.3);
+}
+.card-hover:active {
+  transform: translateY(0);
+}
+
+/* Stat card — scale on hover */
+.stat-card {
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.stat-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 24px rgba(15, 57, 64, 0.1);
+}
+
+/* Button press effect */
+.btn-press {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.btn-press:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(15, 57, 64, 0.2);
+}
+.btn-press:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: none;
+}
+
+/* Table row hover — slide indicator */
+.row-hover {
+  transition: background-color 0.15s ease, box-shadow 0.15s ease;
+  position: relative;
+}
+.row-hover::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%) scaleY(0);
+  width: 3px;
+  height: 60%;
+  background: linear-gradient(180deg, #14b8a6, #02c39a);
+  border-radius: 0 3px 3px 0;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.row-hover:hover::before {
+  transform: translateY(-50%) scaleY(1);
+}
+.row-hover:hover {
+  background-color: rgba(2, 128, 144, 0.04);
+}
+
+/* ═══════════════════════════════════════════
+   KEYFRAME ANIMATIONS
+   ═══════════════════════════════════════════ */
+
+/* Fade in + slide up — for page loads */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in-up {
+  animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Staggered children animation */
+.animate-stagger > * {
+  opacity: 0;
+  animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+.animate-stagger > *:nth-child(1) { animation-delay: 0.05s; }
+.animate-stagger > *:nth-child(2) { animation-delay: 0.1s; }
+.animate-stagger > *:nth-child(3) { animation-delay: 0.15s; }
+.animate-stagger > *:nth-child(4) { animation-delay: 0.2s; }
+.animate-stagger > *:nth-child(5) { animation-delay: 0.25s; }
+.animate-stagger > *:nth-child(6) { animation-delay: 0.3s; }
+.animate-stagger > *:nth-child(7) { animation-delay: 0.35s; }
+.animate-stagger > *:nth-child(8) { animation-delay: 0.4s; }
+.animate-stagger > *:nth-child(9) { animation-delay: 0.45s; }
+.animate-stagger > *:nth-child(10) { animation-delay: 0.5s; }
+
+/* Scale in — for modals and popups */
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+.animate-scale-in {
+  animation: scaleIn 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Slide in from right — for dropdown menus */
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(8px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.animate-slide-in-right {
+  animation: slideInRight 0.15s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Pulse glow — for notification dots */
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(2, 128, 144, 0.4); }
+  50% { box-shadow: 0 0 0 6px rgba(2, 128, 144, 0); }
+}
+.animate-pulse-glow {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+/* Shimmer — for loading skeletons */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.animate-shimmer {
+  background: linear-gradient(90deg, var(--card-border) 25%, rgba(2, 128, 144, 0.08) 50%, var(--card-border) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* Float — for decorative elements */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+/* Orb rotation — for SEIDOR orb animated */
+@keyframes orbRotate {
+  0% { background: linear-gradient(135deg, #14b8a6 0%, #028090 40%, #02c39a 100%); }
+  33% { background: linear-gradient(225deg, #14b8a6 0%, #028090 40%, #02c39a 100%); }
+  66% { background: linear-gradient(315deg, #14b8a6 0%, #028090 40%, #02c39a 100%); }
+  100% { background: linear-gradient(135deg, #14b8a6 0%, #028090 40%, #02c39a 100%); }
+}
+.seidor-orb-animated {
+  animation: orbRotate 6s ease-in-out infinite;
+}
+
+/* ═══════════════════════════════════════════
+   SEIDOR BRAND ELEMENTS
+   ═══════════════════════════════════════════ */
+
+.text-gradient {
+  background: linear-gradient(135deg, #0f3940 0%, #14b8a6 50%, #02c39a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-mesh {
+  background:
+    radial-gradient(at 80% 30%, rgba(2, 128, 144, 0.2) 0px, transparent 50%),
+    radial-gradient(at 20% 80%, rgba(2, 195, 154, 0.15) 0px, transparent 50%),
+    radial-gradient(at 50% 50%, rgba(15, 57, 64, 0.08) 0px, transparent 60%);
+}
+
+.seidor-orb {
+  background: linear-gradient(135deg, #14b8a6 0%, #028090 40%, #02c39a 100%);
+}
+
+.seidor-gradient {
+  background: linear-gradient(135deg, #0f3940 0%, #028090 50%, #14b8a6 100%);
+}
+
+/* Glow shadow for primary buttons */
+.seidor-glow {
+  box-shadow: 0 4px 14px rgba(2, 128, 144, 0.25), 0 1px 3px rgba(15, 57, 64, 0.1);
+}
+.seidor-glow:hover {
+  box-shadow: 0 6px 20px rgba(2, 128, 144, 0.35), 0 2px 6px rgba(15, 57, 64, 0.15);
+}
+
+/* ═══════════════════════════════════════════
+   SCROLLBAR & UTILITIES
+   ═══════════════════════════════════════════ */
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+.dark ::-webkit-scrollbar-thumb { background: #2a2a4a; }
+
+/* Premium card — gradient + layered shadow + relief + glow on hover (MINSUR data-dense) */
+.card-premium {
+  background: linear-gradient(160deg, var(--card) 0%, color-mix(in srgb, var(--accent) 5%, var(--card)) 100%);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--sh-md);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.card-premium:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--sh-lg);
+}
+.text-teal-gradient {
+  background: linear-gradient(135deg, var(--teal-primary), var(--mint));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Focus ring utility */
+.focus-ring {
+  outline: none;
+}
+.focus-ring:focus-visible {
+  box-shadow: 0 0 0 2px var(--background), 0 0 0 4px rgba(2, 128, 144, 0.5);
+}

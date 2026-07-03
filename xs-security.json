@@ -1,0 +1,32 @@
+{
+  "_comment": "NO se despliega: mta.yaml reusa la instancia compartida xsuaa-central (org.cloudfoundry.existing-service). Se conserva sólo como referencia por si se quiere volver a una instancia propia.",
+  "xsappname": "minsur-conecta-gestion-tiempos",
+  "tenant-mode": "dedicated",
+  "description": "Security profile of the BTP Workzone Next.js template",
+  "scopes": [
+    {
+      "name": "uaa.user",
+      "description": "UAA"
+    },
+    {
+      "name": "$XSAPPNAME.GestionTiemposAccess",
+      "description": "Access to the BTP Workzone Next.js template"
+    }
+  ],
+  "role-templates": [
+    {
+      "name": "Token_Exchange",
+      "description": "Required for the OAuth2UserTokenExchange used by the /useridp flow",
+      "scope-references": [
+        "uaa.user"
+      ]
+    },
+    {
+      "name": "GestionTiemposAccess",
+      "description": "BTP Workzone Next.js template access",
+      "scope-references": [
+        "$XSAPPNAME.GestionTiemposAccess"
+      ]
+    }
+  ]
+}

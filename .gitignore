@@ -1,0 +1,30 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+
+# next.js
+/.next/
+/out/
+
+# mta / cf build
+/resources/
+*.mtar
+mta_archives/
+*-content.zip
+
+# production env is committed (seidor default); local env is not
+.env*.local
+
+# misc
+*.log
+npm-debug.log*
+.DS_Store
+*.pem
+.vscode/
+.idea/
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts.bak
+.dev-token

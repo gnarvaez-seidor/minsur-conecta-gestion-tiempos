@@ -1,0 +1,54 @@
+{
+  "_version": "1.32.0",
+  "sap.app": {
+    "id": "minsur.conecta.gestion.workzone.react",
+    "type": "application",
+    "applicationVersion": {
+      "version": "1.0.2"
+    },
+    "title": "BTP Workzone Next.js Template",
+    "description": "Plantilla Next.js (static export) para SAP Build Work Zone",
+    "crossNavigation": {
+      "inbounds": {
+        "btp-template-inbound": {
+          "signature": {
+            "parameters": {},
+            "additionalParameters": "allowed"
+          },
+          "semanticObject": "minsurConectaGestion",
+          "action": "display",
+          "title": "BTP Workzone Next.js Template",
+          "subTitle": "Template",
+          "info": "REACT",
+          "icon": "sap-icon://add-activity"
+        }
+      }
+    }
+  },
+  "sap.ui": {
+    "technology": "UI5",
+    "icons": {
+      "icon": "sap-icon://task"
+    },
+    "deviceTypes": {
+      "desktop": true,
+      "tablet": true,
+      "phone": true
+    }
+  },
+  "sap.ui5": {
+    "dependencies": {
+      "minUI5Version": "1.97.0",
+      "libs": {}
+    }
+  },
+  "sap.cloud": {
+    "public": true,
+    "service": "minsur-conecta-gestion-bs"
+  },
+  "sap.platform.cf": {
+    "oAuthScopes": [
+      "$XSAPPNAME.GestionTiemposAccess"
+    ]
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "welcomeFile": "/index.html",
+  "authenticationMethod": "route",
+  "routes": [
+    {
+      "source": "^/dest-apiseguridad/(.*)$",
+      "target": "$1",
+      "authenticationType": "xsuaa",
+      "destination": "dest-apiseguridad",
+      "csrfProtection": false
+    },
+    {
+      "source": "^/dest-apigateway/(.*)$",
+      "target": "$1",
+      "authenticationType": "xsuaa",
+      "destination": "dest-apigateway",
+      "csrfProtection": false
+    },
+    {
+      "source": "^(.*)$",
+      "target": "$1",
+      "service": "html5-apps-repo-rt",
+      "authenticationType": "xsuaa",
+      "cacheControl": "no-cache, no-store, must-revalidate"
+    }
+  ]
+}

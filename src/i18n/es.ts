@@ -1,0 +1,90 @@
+import type { Dictionary } from "./types";
+
+// Spanish dictionary — typed against `Dictionary` so it must match en.ts exactly.
+export const es: Dictionary = {
+  common: {
+    search: "Buscar",
+    cancel: "Cancelar",
+    confirm: "Confirmar",
+    delete: "Eliminar",
+    close: "Cerrar",
+    loading: "Cargando…",
+    new: "Nuevo",
+    logout: "Cerrar sesión",
+    noResults: "No se encontraron resultados",
+    all: "Todos",
+    clear: "Limpiar",
+    retry: "Reintentar",
+  },
+  app: {
+    name: "Plantilla BTP Workzone",
+    tagline: "Next.js · SAP Build Work Zone",
+  },
+  nav: {
+    records: "Registros",
+    home: "Inicio",
+  },
+  theme: {
+    toggle: "Cambiar tema",
+    workzoneManaged: "El tema lo gestiona Workzone",
+  },
+  locale: {
+    label: "Idioma",
+    en: "EN",
+    es: "ES",
+  },
+  auth: {
+    sessionCheck: "Verificando sesión…",
+    title: "Iniciar sesión",
+    tokenLabel: "Pega un JWT o la respuesta JSON de /useridp",
+    tokenPlaceholder: 'eyJhbGciOi…  o  { "sToken": … }',
+    signIn: "Iniciar sesión",
+    mockNotice: "Modo mock activo — sesión iniciada automáticamente.",
+    invalidToken: "No se pudo interpretar el token.",
+  },
+  records: {
+    title: "Registros",
+    subtitle: "Vista CRUD de ejemplo — el patrón canónico descompuesto",
+    newRecord: "Nuevo registro",
+    count: "{count} registros",
+    error: "No se pudieron cargar los registros.",
+    empty: "Ningún registro coincide con los filtros.",
+    densityLabel: "Densidad",
+    densityComfortable: "Cómoda",
+    densityCompact: "Compacta",
+    filters: {
+      status: "Estado",
+      from: "Desde",
+      to: "Hasta",
+      searchPlaceholder: "Buscar por código o título…",
+      active: "{count} activos",
+    },
+    table: {
+      code: "Código",
+      title: "Título",
+      status: "Estado",
+      date: "Fecha",
+      owner: "Responsable",
+      actions: "Acciones",
+      view: "Ver",
+    },
+    estados: {
+      draft: "Borrador",
+      pending: "Pendiente",
+      approved: "Aprobado",
+      rejected: "Rechazado",
+      archived: "Archivado",
+    },
+    stats: {
+      total: "Total",
+      approved: "Aprobados",
+      pending: "Pendientes",
+      rejected: "Rechazados",
+    },
+    detail: {
+      title: "Detalle del registro",
+      deleteTitle: "Eliminar registro",
+      deleteConfirm: "Esto eliminará el registro permanentemente. ¿Continuar?",
+    },
+  },
+};
