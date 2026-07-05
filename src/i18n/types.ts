@@ -6,7 +6,7 @@ export type Dictionary = typeof en;
 export type Locale = "en" | "es";
 
 /**
- * Recursive dot-paths to the STRING leaves of the dictionary, e.g. "records.table.code".
+ * Recursive dot-paths to the STRING leaves of the dictionary, e.g. "nav.roster".
  * Gives `t()` autocomplete + compile-time safety against typos.
  */
 export type DotPaths<T> = T extends string

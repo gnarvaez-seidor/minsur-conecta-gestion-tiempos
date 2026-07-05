@@ -19,13 +19,14 @@ El bundle se sirve como **estático** desde el HTML5 App Repo bajo un path versi
 - **Skeletons, no spinners.** Usa los primitivos de `src/components/ui/Skeleton.tsx` (`animate-shimmer`).
 - **Hover:** `.card-hover` (cards clickeables), `.stat-card` (KPIs), `.row-hover` (filas de tabla). No inline hover.
 - **Iconos:** `react-icons/fi` (Feather) en todo.
+- **Overlays con portal (OBLIGATORIO).** Todo overlay full-viewport (`position: fixed` que cubre pantalla: modal, dialog, confirm, drawer, panel lateral, toast) DEBE renderizarse vía `createPortal` a `document.body` — usa el primitivo `src/components/ui/Portal.tsx`, o los primitivos ya portalizados `ui/Modal.tsx` / `ui/ConfirmDialog.tsx`. Motivo: la app usa `transform` (`animate-fade-in-up`, `animate-scale-in`, …) por todos lados y **un ancestro transformado se vuelve el containing block de los descendientes `fixed`**, así que un `fixed inset-0` sin portal se ancla a un subárbol y no cubre el viewport. Contrato del overlay bespoke: `role="dialog"`+`aria-modal`, cierre por Esc, clic en backdrop, `body` scroll-lock, manejo de foco y `prefers-reduced-motion`.
 - **Tailwind v4 CSS-first:** NO hay `tailwind.config.js`. Tokens en `globals.css` via `@theme inline`; CSS vars en `:root`/`.dark`.
-- Excepción documentada: el look "management/data-table" (grays explícitos + acento púrpura) es la única excepción sancionada; la vista `records` de la plantilla NO la usa (modela la regla por defecto con CSS-vars).
+- Excepción documentada: el look "management/data-table" (grays explícitos + acento púrpura) es la única excepción sancionada; las vistas de la app NO la usan (modelan la regla por defecto con CSS-vars).
 
 ## Estado
 
 - **Context** (transversal): `AuthContext`, `WorkzoneThemeContext`, `I18nContext`.
-- **Redux Toolkit** (UI/dominio): `store/slices/uiSlice.ts` (`searchQuery`, `density`) — ejemplo funcional consumido por la vista `records`. Usa `useAppSelector`/`useAppDispatch` de `store/hooks.ts`.
+- **Redux Toolkit** (UI/dominio): `store/slices/uiSlice.ts` (`searchQuery`, `density`) — slice de ejemplo (sin consumidor tras retirar `records`); se conserva como referencia del store. Usa `useAppSelector`/`useAppDispatch` de `store/hooks.ts`.
 
 ## Auth (`src/auth/`)
 
@@ -33,15 +34,15 @@ Abstracción `AuthStrategy` (interfaz) + 3 estrategias (`seidor` | `xsuaa` | `mo
 
 ## i18n
 
-`I18nContext` + diccionarios `src/i18n/{en,es}.ts` (mismo shape; `es` tipado contra `Dictionary` → claves faltantes fallan el build). `useTranslation()` → `t('records.table.code')` con claves tipadas. NO next-intl.
+`I18nContext` + diccionarios `src/i18n/{en,es}.ts` (mismo shape; `es` tipado contra `Dictionary` → claves faltantes fallan el build). `useTranslation()` → `t('nav.roster')` con claves tipadas. NO next-intl.
 
 ## Tema (requisito nube + local)
 
-`WorkzoneThemeContext` es la única fuente de verdad del tema y togglea `.dark` en `<html>`. En Workzone: `?wzTheme` (carga) + postMessage de `Component.js` (runtime). Fuera: toggle manual + `prefers-color-scheme` + sessionStorage.
+`WorkzoneThemeContext` es la única fuente de verdad del tema y togglea `.dark` en `<html>`. En Workzone: `?wzTheme` (carga) + postMessage de `Component.js` (runtime). Fuera de Workzone: por defecto **light** (dark es opt-in, NO sigue el `prefers-color-scheme` del SO) + toggle manual + sessionStorage.
 
-## Patrón de vista (gold standard: `src/components/records/`)
+## Patrón de vista (gold standard: `src/components/roster/`)
 
-`app/page.tsx` (shell) → `RecordsView.tsx` (orquestador fino) → `hooks/` (datos/filtros/paginación) + `components/` (Header, StatsCards, FiltersPanel, Table, MobileCards, Pagination) + `modals/`. El detalle es un **Modal**, no una ruta.
+`app/page.tsx` (shell) → `RosterView.tsx` (orquestador fino) → `hooks/` (datos/derivados/paginación) + `components/` + `modals/`. El detalle/acción es un **Modal**, no una ruta. La paginación reutilizable vive en `src/hooks/usePagination.ts` + `src/components/ui/Pagination.tsx` (compartida por las vistas).
 
 ## Renombrar por app
 

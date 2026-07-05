@@ -9,8 +9,9 @@
  *     read from window in a useEffect (avoids SSG/CSR mismatch).
  *
  * Initial-mode sources (priority): manual override (sessionStorage, only OUTSIDE Workzone)
- * → `?wzTheme=` query param (Component.js) → prefers-color-scheme. Runtime changes arrive via
- * postMessage `{ source:'workzone-bridge', type:'theme-changed', theme }`.
+ * → `?wzTheme=` query param (Component.js) → light by default (dark is opt-in via the manual
+ * toggle, NOT OS-driven). Runtime changes arrive via postMessage
+ * `{ source:'workzone-bridge', type:'theme-changed', theme }`.
  */
 import React, {
   createContext,
@@ -74,11 +75,8 @@ function readInitialMode(): ThemeMode {
   } catch {
     /* ignore */
   }
-  try {
-    if (window.matchMedia?.("(prefers-color-scheme: dark)").matches) return "dark";
-  } catch {
-    /* ignore */
-  }
+  // Default is light regardless of the OS: dark is opt-in via the manual toggle (standalone)
+  // or driven by the launchpad theme inside Workzone.
   return "light";
 }
 
@@ -134,20 +132,8 @@ export const WorkzoneThemeProvider: React.FC<{ children: React.ReactNode }> = ({
       }
     };
     window.addEventListener("message", handleMessage);
-
-    let mq: MediaQueryList | null = null;
-    let mqHandler: ((e: MediaQueryListEvent) => void) | null = null;
-    if (!isInsideWorkzone() && window.matchMedia) {
-      mq = window.matchMedia("(prefers-color-scheme: dark)");
-      mqHandler = (e) => {
-        if (!readManualOverride()) setModeWithTransition(e.matches ? "dark" : "light");
-      };
-      mq.addEventListener?.("change", mqHandler);
-    }
-
     return () => {
       window.removeEventListener("message", handleMessage);
-      if (mq && mqHandler) mq.removeEventListener?.("change", mqHandler);
     };
   }, [setModeWithTransition]);
 

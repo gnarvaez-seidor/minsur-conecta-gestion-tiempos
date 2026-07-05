@@ -41,12 +41,12 @@ jwt_valid() {
 # 3) cache
 if [ -z "$TOKEN" ] && [ -f "$CACHE" ]; then
   CACHED=$(cat "$CACHE")
-  if jwt_valid "$CACHED"; then TOKEN="$CACHED"; echo "✓ token de cache vigente (.dev-token)"; else echo "· cache expirado"; fi
+  if jwt_valid "$CACHED"; then TOKEN="$CACHED"; echo "✓ token de cache vigente (.dev-token)" >&2; else echo "· cache expirado" >&2; fi
 fi
 
 # 4) pedirlo al gateway (token:user:json → xsuaa-central, ROPC)
 if [ -z "$TOKEN" ] && [ -d "$GW_DIR" ] && grep -q '"token:user:json"' "$GW_DIR/package.json" 2>/dev/null; then
-  echo "· obteniendo token vía gateway (npm run token:user:json)…"
+  echo "· obteniendo token vía gateway (npm run token:user:json)…" >&2
   RAW=$( (cd "$GW_DIR" && npm run -s token:user:json 2>/dev/null) || true )
   TOKEN=$(printf '%s' "$RAW" | grep -oE '"(access_token|sToken)"\s*:\s*"[^"]+"' | head -1 | sed -E 's/.*:\s*"([^"]+)"/\1/' || true)
   [ -z "$TOKEN" ] && TOKEN=$(printf '%s' "$RAW" | grep -oE 'eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+' | head -1 || true)
@@ -54,18 +54,23 @@ fi
 
 if [ -n "$TOKEN" ] && jwt_valid "$TOKEN"; then
   printf '%s' "$TOKEN" > "$CACHE"; chmod 600 "$CACHE"
-  echo "✓ token vigente cacheado en .dev-token (gitignored)"
+  echo "✓ token vigente cacheado en .dev-token (gitignored)" >&2
 else
-  echo "⚠ sin token válido — el front arrancará igual; pega el sToken en #/login,"
-  echo "  o corre el gateway con --no-auth: ../dev-conecta.sh --no-auth"
+  echo "⚠ sin token válido — el front arrancará igual; pega el sToken en #/login," >&2
+  echo "  o corre el gateway con --no-auth: ../dev-conecta.sh --no-auth" >&2
 fi
 
+# --print: SOLO el token por stdout (los mensajes de arriba van a stderr) → capturable por
+# dev-conecta.sh / minsurapps.sh vía $(... --print).
 $PRINT_ONLY && { [ -n "$TOKEN" ] && echo "$TOKEN"; exit 0; }
 
-echo "▶ levantando frontend :3001 → gateway :8082 (strategy=seidor, DEV_FORWARD_AUTH)"
+echo "▶ levantando frontend :3001 → gateway :8082 (strategy=seidor, DEV_FORWARD_AUTH)" >&2
 cd "$DIR"
+# NEXT_PUBLIC_DEV_TOKEN → el front hace auto-login en dev (AuthContext, guardado por NODE_ENV).
+# Vacío si no hubo token → inerte. NUNCA escribir esto en .env.local (lo carga el compose Docker).
 NEXT_PUBLIC_AUTH_STRATEGY=seidor \
 NEXT_PUBLIC_API_GATEWAY_URL=http://localhost:8082 \
 NEXT_PUBLIC_API_SEGURIDAD_URL=http://localhost:8082 \
 NEXT_PUBLIC_DEV_FORWARD_AUTH=true \
+NEXT_PUBLIC_DEV_TOKEN="$TOKEN" \
 exec npm run dev -- -p 3001

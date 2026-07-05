@@ -10,6 +10,7 @@ import {
   FiAlertTriangle,
 } from "react-icons/fi";
 import { useTranslation } from "@/context/I18nContext";
+import Portal from "@/components/ui/Portal";
 import type { NotificationItem } from "@/services/notificationsService";
 import { useNotifications } from "./hooks/useNotifications";
 import {
@@ -74,6 +75,7 @@ export default function NotificationsPanel({ open, onClose }: Props) {
     unread === 1 ? tt(lang, "unreadOne") : tt(lang, "unreadMany", { n: unread });
 
   return (
+    <Portal>
     <div className={`fixed inset-0 z-[60] ${open ? "" : "pointer-events-none"}`} aria-hidden={!open}>
       {/* overlay */}
       <div
@@ -191,6 +193,7 @@ export default function NotificationsPanel({ open, onClose }: Props) {
         </div>
       </aside>
     </div>
+    </Portal>
   );
 }
 

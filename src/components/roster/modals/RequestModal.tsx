@@ -5,6 +5,7 @@ import { FiX, FiRepeat } from "react-icons/fi";
 import type { Employee, OverrideType } from "../types";
 import { L } from "../constants";
 import CodeChip from "../components/CodeChip";
+import Portal from "@/components/ui/Portal";
 
 interface Props {
   open: boolean;
@@ -27,10 +28,23 @@ export default function RequestModal({ open, team, initialType, initialEmployeeI
 
   useEffect(() => { if (open) setType(initialType); }, [open, initialType]);
 
+  // Lock body scroll + close on Esc while open (matches ui/Modal.tsx contract).
+  useEffect(() => {
+    if (!open) return;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [open, onClose]);
+
   if (!open) return null;
   const title = type === "absence" ? "IT 2001" : type === "presence" ? "IT 2002" : "IT 2003";
 
   return (
+    <Portal>
     <div className="fixed inset-0 z-50 grid place-items-center p-5" role="dialog" aria-modal="true">
       <div className="absolute inset-0 bg-[rgba(6,20,23,0.55)] backdrop-blur-sm" onClick={onClose} />
       <div className="relative w-[560px] max-w-full max-h-[90vh] overflow-auto rounded-2xl border border-[var(--card-border)] bg-[var(--card)] shadow-2xl animate-scale-in">
@@ -78,6 +92,7 @@ export default function RequestModal({ open, team, initialType, initialEmployeeI
       </div>
       <style jsx>{`.fld{width:100%;border:1px solid var(--card-border);background:color-mix(in srgb,var(--card) 92%, var(--accent-light));color:var(--foreground);border-radius:10px;padding:10px 12px;font-size:13.5px}`}</style>
     </div>
+    </Portal>
   );
 }
 

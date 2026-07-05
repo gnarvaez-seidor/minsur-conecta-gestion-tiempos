@@ -29,29 +29,49 @@
   --seidor-blue: #028090;
   --seidor-cyan: #14b8a6;
   --seidor-violet: #02c39a;
+  /* tokenized accents so the dark theme can neutralize surfaces without touching light.
+     Light keeps the exact current values. `--glow-rgb` is an r,g,b triplet consumed via
+     rgba(var(--glow-rgb), a) so each effect keeps its own alpha. */
+  --row-hover-bg: rgba(2, 128, 144, 0.04);
+  --row-indicator: linear-gradient(180deg, #14b8a6, #02c39a);
+  --shimmer-mid: rgba(2, 128, 144, 0.08);
+  --scrollbar-thumb: #cbd5e1;
+  --scrollbar-thumb-hover: #94a3b8;
+  --glow-rgb: 2, 128, 144;
 }
 
+/* Dark = neutral slate surfaces; teal is reserved for accents/active/focus only
+   (no green-tinted backgrounds). Light stays exactly as-is. */
 .dark {
-  --background: #081215;
-  --foreground: #e7f4f4;
-  --card: #10242a;
-  --card-border: #1c353c;
-  --muted: #7f9ea3;
-  --accent: #2dd4bf;
+  --background: #0b0f14;   /* slate, near-black — no green tint */
+  --foreground: #e6edf3;   /* neutral near-white */
+  --card: #151b23;         /* slate surface */
+  --card-border: #232a35;  /* neutral border */
+  --muted: #8b97a5;        /* neutral gray-blue */
+  --accent: #2dd4bf;       /* teal — accent only */
   --accent-hover: #5eead4;
-  --accent-light: #123531;
-  --teal-deep: #0b3b40;
-  --teal-primary: #14b8a6;
-  --teal-mid: #2dd4bf;
+  --accent-light: #17302e; /* active pill bg — subtle, low-sat teal */
+  --teal-deep: #0c3b3f;
+  --teal-primary: #2dd4bf;
+  --teal-mid: #5eead4;
   --mint: #2dd4bf;
-  --mint-soft: #134b43;
-  --grad-header: linear-gradient(120deg, #0b3b40 0%, #06181c 100%);
+  --mint-soft: #12403a;
+  --grad-header: linear-gradient(120deg, #101720 0%, #0b0f14 100%); /* neutral, not teal */
   --sh-md: 0 6px 16px rgba(0, 0, 0, 0.45);
   --sh-lg: 0 16px 40px rgba(0, 0, 0, 0.55);
-  --seidor-navy: #7fe0d4;
+  /* legacy aliases → neutral except the teal accent (used sparingly by template bits) */
+  --seidor-navy: #cbd5e1;
   --seidor-blue: #2dd4bf;
   --seidor-cyan: #5eead4;
-  --seidor-violet: #6ee7b7;
+  --seidor-violet: #2dd4bf;
+  /* neutralize the tokenized accents for dark: hover/skeleton/scrollbar go neutral,
+     glow + indicator use the teal accent so it still reads as the brand highlight. */
+  --row-hover-bg: rgba(255, 255, 255, 0.045);
+  --row-indicator: linear-gradient(180deg, #2dd4bf, #14b8a6);
+  --shimmer-mid: rgba(148, 163, 184, 0.10);
+  --scrollbar-thumb: #2a3441;
+  --scrollbar-thumb-hover: #3a4759;
+  --glow-rgb: 45, 212, 191;
 }
 
 @theme inline {
@@ -93,9 +113,9 @@ button, a, input, select, textarea {
               border-color 0.3s ease;
 }
 .card-hover:hover {
-  box-shadow: 0 8px 30px rgba(15, 57, 64, 0.1), 0 2px 8px rgba(2, 128, 144, 0.06);
+  box-shadow: 0 8px 30px rgba(15, 57, 64, 0.1), 0 2px 8px rgba(var(--glow-rgb), 0.06);
   transform: translateY(-2px);
-  border-color: rgba(2, 128, 144, 0.3);
+  border-color: rgba(var(--glow-rgb), 0.3);
 }
 .card-hover:active {
   transform: translateY(0);
@@ -137,7 +157,7 @@ button, a, input, select, textarea {
   transform: translateY(-50%) scaleY(0);
   width: 3px;
   height: 60%;
-  background: linear-gradient(180deg, #14b8a6, #02c39a);
+  background: var(--row-indicator);
   border-radius: 0 3px 3px 0;
   transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -145,7 +165,7 @@ button, a, input, select, textarea {
   transform: translateY(-50%) scaleY(1);
 }
 .row-hover:hover {
-  background-color: rgba(2, 128, 144, 0.04);
+  background-color: var(--row-hover-bg);
 }
 
 /* ═══════════════════════════════════════════
@@ -197,8 +217,8 @@ button, a, input, select, textarea {
 
 /* Pulse glow — for notification dots */
 @keyframes pulseGlow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(2, 128, 144, 0.4); }
-  50% { box-shadow: 0 0 0 6px rgba(2, 128, 144, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(var(--glow-rgb), 0.4); }
+  50% { box-shadow: 0 0 0 6px rgba(var(--glow-rgb), 0); }
 }
 .animate-pulse-glow {
   animation: pulseGlow 2s ease-in-out infinite;
@@ -210,7 +230,7 @@ button, a, input, select, textarea {
   100% { background-position: 200% 0; }
 }
 .animate-shimmer {
-  background: linear-gradient(90deg, var(--card-border) 25%, rgba(2, 128, 144, 0.08) 50%, var(--card-border) 75%);
+  background: linear-gradient(90deg, var(--card-border) 25%, var(--shimmer-mid) 50%, var(--card-border) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s ease-in-out infinite;
 }
@@ -263,10 +283,10 @@ button, a, input, select, textarea {
 
 /* Glow shadow for primary buttons */
 .seidor-glow {
-  box-shadow: 0 4px 14px rgba(2, 128, 144, 0.25), 0 1px 3px rgba(15, 57, 64, 0.1);
+  box-shadow: 0 4px 14px rgba(var(--glow-rgb), 0.25), 0 1px 3px rgba(15, 57, 64, 0.1);
 }
 .seidor-glow:hover {
-  box-shadow: 0 6px 20px rgba(2, 128, 144, 0.35), 0 2px 6px rgba(15, 57, 64, 0.15);
+  box-shadow: 0 6px 20px rgba(var(--glow-rgb), 0.35), 0 2px 6px rgba(15, 57, 64, 0.15);
 }
 
 /* ═══════════════════════════════════════════
@@ -275,9 +295,8 @@ button, a, input, select, textarea {
 
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-.dark ::-webkit-scrollbar-thumb { background: #2a2a4a; }
+::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover); }
 
 /* Premium card — gradient + layered shadow + relief + glow on hover (MINSUR data-dense) */
 .card-premium {
@@ -302,5 +321,5 @@ button, a, input, select, textarea {
   outline: none;
 }
 .focus-ring:focus-visible {
-  box-shadow: 0 0 0 2px var(--background), 0 0 0 4px rgba(2, 128, 144, 0.5);
+  box-shadow: 0 0 0 2px var(--background), 0 0 0 4px rgba(var(--glow-rgb), 0.5);
 }

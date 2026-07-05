@@ -7,7 +7,7 @@ import { useCallback, useEffect, useState } from "react";
  * so deep links must never reach the server as real paths. Everything after `#` is client-only,
  * so a single physical index.html serves every route — no host config, no 404 on reload.
  */
-export type RouteName = "roster" | "profile" | "records" | "login" | "demo";
+export type RouteName = "roster" | "profile" | "login" | "demo";
 export interface HashRoute {
   name: RouteName;
 }
@@ -18,7 +18,6 @@ function parseHash(): HashRoute {
   if (head === "login") return { name: "login" };
   if (head === "demo") return { name: "demo" };
   if (head === "profile") return { name: "profile" };
-  if (head === "records") return { name: "records" };
   return { name: "roster" };
 }
 

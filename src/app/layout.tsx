@@ -19,13 +19,13 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "BTP Workzone Next.js Template",
-  description: "Plantilla Next.js (static export) para SAP Build Work Zone",
+  title: "MINSUR Conecta — Gestión de Tiempos",
+  description: "Gestión de tiempos de MINSUR sobre SAP Build Work Zone",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${jakarta.variable}`} suppressHydrationWarning>
+    <html lang="es" className={`${inter.variable} ${jakarta.variable}`} suppressHydrationWarning>
       <body className="font-[family-name:var(--font-sans)] antialiased bg-[var(--background)] text-[var(--foreground)]">
         <AppProviders>{children}</AppProviders>
       </body>

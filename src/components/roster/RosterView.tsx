@@ -4,8 +4,9 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { FiPlus, FiRepeat, FiChevronLeft, FiChevronRight, FiSearch, FiClock } from "react-icons/fi";
 import { useTranslation } from "@/context/I18nContext";
 import { useRoster } from "./hooks/useRoster";
-import { usePagination } from "@/components/records/hooks/usePagination";
-import Pagination from "@/components/records/components/Pagination";
+import { usePagination } from "@/hooks/usePagination";
+import Pagination from "@/components/ui/Pagination";
+import Portal from "@/components/ui/Portal";
 import RosterStats from "./components/RosterStats";
 import RosterCalendar from "./components/RosterCalendar";
 import RosterSummary from "./components/RosterSummary";
@@ -126,7 +127,10 @@ export default function RosterView() {
               <Legend master={data} locale={locale} />
             </div>
           ) : (
-            <RosterSummary master={data} locale={locale} filter={search} />
+            <>
+              <RosterSummary master={data} locale={locale} team={paginatedData} />
+              <Pagination page={safePage} totalPages={totalPages} pageNumbers={pageNumbers} onPage={setPaginaActual} />
+            </>
           )}
         </>
       )}
@@ -134,9 +138,11 @@ export default function RosterView() {
       <RequestModal open={modal.open} team={data?.team || []} initialType={modal.type} initialEmployeeId={modal.emp} locale={locale} onClose={() => setModal((s) => ({ ...s, open: false }))} onSubmit={submitReq} />
 
       {toast && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[90] flex items-center gap-2.5 px-5 py-3 rounded-xl text-white text-[13.5px] font-semibold shadow-2xl animate-fade-in-up" style={{ background: "var(--teal-deep,#0f3940)", borderLeft: "4px solid var(--mint,#02c39a)" }} role="status" aria-live="polite">
-          {toast}
-        </div>
+        <Portal>
+          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[90] flex items-center gap-2.5 px-5 py-3 rounded-xl text-white text-[13.5px] font-semibold shadow-2xl animate-fade-in-up" style={{ background: "var(--teal-deep,#0f3940)", borderLeft: "4px solid var(--mint,#02c39a)" }} role="status" aria-live="polite">
+            {toast}
+          </div>
+        </Portal>
       )}
 
       <style jsx>{`

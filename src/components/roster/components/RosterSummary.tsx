@@ -1,12 +1,13 @@
 "use client";
 
 import CodeChip from "./CodeChip";
-import type { RosterMaster, Override } from "../types";
+import type { RosterMaster, Override, Employee } from "../types";
 import { L } from "../constants";
 
-export default function RosterSummary({ master, locale, filter }: { master: RosterMaster; locale: string; filter: string }) {
+// `team` is the already-filtered + paginated slice from RosterView's single usePagination
+// instance (shared with the detail view); `master` is kept for the overrides lookup.
+export default function RosterSummary({ master, locale, team }: { master: RosterMaster; locale: string; team: Employee[] }) {
   const T = L[locale] || L.es;
-  const team = master.team.filter((e) => e.name.toLowerCase().includes(filter));
   const cols = [T.c_emp, T.c_pos, T.c_guard, T.c_pres, T.c_abs, T.c_sub, T.c_st];
   const get = (id: string, ty: Override["type"]) => master.overrides.filter((o) => o.employeeId === id && o.type === ty);
   const tag = (list: Override[]) =>

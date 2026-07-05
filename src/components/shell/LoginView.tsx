@@ -38,7 +38,7 @@ export default function LoginView() {
         nombre: jwt.Nombre || "",
         apellido: jwt.Apellido || "",
       });
-      window.location.hash = "#/records";
+      window.location.hash = "#/roster";
     } catch {
       setError(t("auth.invalidToken"));
     }
