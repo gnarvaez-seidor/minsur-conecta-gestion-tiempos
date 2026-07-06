@@ -25,6 +25,7 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: prd
     steps:
       - name: Checkout
         uses: actions/checkout@v5
