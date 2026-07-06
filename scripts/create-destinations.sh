@@ -2,22 +2,23 @@
 # Crea/actualiza los destinos subaccount dest-apigateway y dest-apiseguridad
 # (destinos planos hacia el API Gateway con token forwarding) vía la API del
 # destination service. Requiere sesión cf activa y el service-key 'dest-admin-key'
-# sobre la instancia 'btp-workzone-nextjs-template-dest'.
+# sobre la instancia de destination del subaccount (por defecto la de esta app).
+# NOTA: ajusta DEST_INSTANCE/KEY al nombre real de tu service instance si difiere.
 #
 # Uso: ./scripts/create-destinations.sh [GATEWAY_URL]
 set -euo pipefail
 
-GATEWAY_URL="${1:-https://minsur-apigateway-backend-dev.cfapps.us10-001.hana.ondemand.com}"
-DEST_INSTANCE="btp-workzone-nextjs-template-dest"
-KEY="dest-admin-key"
+GATEWAY_URL="${1:-https://minsur-conecta-apigateway-backend-dev.cfapps.us10-001.hana.ondemand.com}"
+DEST_INSTANCE="${DEST_INSTANCE:-minsur-conecta-gestion-tiempos-dest}"
+KEY="${DEST_KEY:-dest-admin-key}"
 
 command -v cf >/dev/null || { echo "cf CLI requerido"; exit 1; }
 cf service-key "$DEST_INSTANCE" "$KEY" >/dev/null 2>&1 || cf create-service-key "$DEST_INSTANCE" "$KEY" >/dev/null
 
 CREDS_JSON=$(cf service-key "$DEST_INSTANCE" "$KEY" | tail -n +2)
 
-GATEWAY_URL="$GATEWAY_URL" node <<'NODE'
-const raw = require('child_process').execSync('cf service-key btp-workzone-nextjs-template-dest dest-admin-key', {encoding:'utf8'});
+GATEWAY_URL="$GATEWAY_URL" DEST_INSTANCE="$DEST_INSTANCE" DEST_KEY="$KEY" node <<'NODE'
+const raw = require('child_process').execSync(`cf service-key ${process.env.DEST_INSTANCE} ${process.env.DEST_KEY}`, {encoding:'utf8'});
 const json = JSON.parse(raw.slice(raw.indexOf('{')));
 const c = json.credentials || json;
 const tokenUrl = `${c.url.replace(/\/$/,'')}/oauth/token`;

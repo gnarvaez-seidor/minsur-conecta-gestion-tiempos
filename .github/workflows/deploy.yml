@@ -73,4 +73,4 @@ jobs:
           cf target -o "$CF_ORG" -s "$CF_SPACE"
 
       - name: Deploy MTA
-        run: cf deploy "$(ls mta_archives/*.mtar | head -n 1)" -f
+        run: cf deploy "$(ls mta_archives/*.mtar | head -n 1)" -f --version-rule ALL

@@ -1,6 +1,6 @@
-# CLAUDE.md — btp-workzone-nextjs-template
+# CLAUDE.md — minsur-conecta-gestion-tiempos
 
-Plantilla Next.js 16 (App Router, **static export**) para SAP Build Work Zone, con el patrón canónico SeidorApps. Lee esto antes de tocar código.
+Frontend **Gestión de Tiempos** (MINSUR Conecta): Next.js 16 (App Router, **static export**) para SAP Build Work Zone, ruta `#/roster`, estrategia `seidor`, sobre el patrón canónico SeidorApps (derivado de `btp-workzone-nextjs-template`). Desplegado en `d98ebda5trial/dev` (HTML5 repo `minsur-conecta-gestion-tiempos-html5-host`, sitio `minsur-workzone`). Lee esto antes de tocar código.
 
 ## Restricciones del static-export (NO romper)
 

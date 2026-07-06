@@ -20,7 +20,7 @@ modules:
           content-target: true
     parameters:
       # URL del API Gateway por ambiente (default dev; override con mtaext/{qas,prd}.mtaext).
-      gateway-url: https://minsur-apigateway-backend-dev.cfapps.us10-001.hana.ondemand.com
+      gateway-url: https://minsur-conecta-apigateway-backend-dev.cfapps.us10-001.hana.ondemand.com
       content:
         subaccount:
           destinations:

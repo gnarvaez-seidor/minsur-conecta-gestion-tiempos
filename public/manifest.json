@@ -4,21 +4,21 @@
     "id": "minsur.conecta.gestion.workzone.react",
     "type": "application",
     "applicationVersion": {
-      "version": "1.0.2"
+      "version": "1.0.3"
     },
-    "title": "BTP Workzone Next.js Template",
-    "description": "Plantilla Next.js (static export) para SAP Build Work Zone",
+    "title": "Gestión de Tiempos",
+    "description": "MINSUR Conecta — Gestión de Tiempos (roster y notificaciones)",
     "crossNavigation": {
       "inbounds": {
-        "btp-template-inbound": {
+        "minsur-conecta-gestion-inbound": {
           "signature": {
             "parameters": {},
             "additionalParameters": "allowed"
           },
           "semanticObject": "minsurConectaGestion",
           "action": "display",
-          "title": "BTP Workzone Next.js Template",
-          "subTitle": "Template",
+          "title": "Gestión de Tiempos",
+          "subTitle": "MINSUR Conecta",
           "info": "REACT",
           "icon": "sap-icon://add-activity"
         }

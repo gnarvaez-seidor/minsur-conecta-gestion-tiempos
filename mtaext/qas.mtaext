@@ -6,4 +6,4 @@ extends: minsur-conecta-gestion-tiempos
 modules:
   - name: minsur-conecta-gestion-tiempos-destination-content
     parameters:
-      gateway-url: https://mazda-apigateway-backend-qas.cfapps.us10-001.hana.ondemand.com
+      gateway-url: https://minsur-conecta-apigateway-backend-qas.cfapps.us10-001.hana.ondemand.com
